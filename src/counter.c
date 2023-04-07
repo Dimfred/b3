@@ -41,7 +41,7 @@ b3_counter_new(int start, char reenable)
 
 	counter->counter = start;
 	counter->reenable = reenable;
-	list_new(&(counter->reenabled_ones));
+	cc_list_new(&(counter->reenabled_ones));
 
 	return counter;
 }
@@ -49,7 +49,7 @@ b3_counter_new(int start, char reenable)
 int
 b3_counter_free(b3_counter_t *counter)
 {
-	list_destroy_cb(counter->reenabled_ones, free);
+	cc_list_destroy_cb(counter->reenabled_ones, free);
 	counter->reenabled_ones = NULL;
 
 	free(counter);
@@ -66,10 +66,10 @@ b3_counter_next(b3_counter_t *counter)
 	fetch_next = 0;
 	if (b3_counter_is_reenable(counter)) {
 		first = NULL;
-		list_get_first(counter->reenabled_ones, (void *) &first);
+		cc_list_get_first(counter->reenabled_ones, (void *) &first);
 		if (first) {
 			next = *first;
-			list_remove_first(counter->reenabled_ones, (void *) &first);
+			cc_list_remove_first(counter->reenabled_ones, (void *) &first);
 			free(first);
 			first = NULL;
 		} else {
@@ -99,8 +99,8 @@ b3_counter_add(b3_counter_t *counter, int number)
 
 		reenabled = malloc(sizeof(int));
 		*reenabled = number;
-		list_add(counter->reenabled_ones, reenabled);
-		list_sort_in_place(counter->reenabled_ones, arithmentic_cmp);
+		cc_list_add(counter->reenabled_ones, reenabled);
+		cc_list_sort_in_place(counter->reenabled_ones, arithmentic_cmp);
 		error = 0;
 	}
 
@@ -113,7 +113,7 @@ b3_counter_disable(b3_counter_t *counter, int disable)
 	int error;
 	int i;
 	int *reenabled;
-	ListIter iter;
+	CC_ListIter iter;
 
 	error = 1;
 	if (b3_counter_is_reenable(counter)) {
@@ -125,10 +125,10 @@ b3_counter_disable(b3_counter_t *counter, int disable)
 			}
 			counter->counter = disable + 1;
 		} else {
-			list_iter_init(&iter, counter->reenabled_ones);
-			while (list_iter_next(&iter, &reenabled) != CC_ITER_END) {
+			cc_list_iter_init(&iter, counter->reenabled_ones);
+			while (cc_list_iter_next(&iter, &reenabled) != CC_ITER_END) {
 				if (*reenabled == disable) {
-					list_iter_remove(&iter, NULL);
+					cc_list_iter_remove(&iter, NULL);
 					free(reenabled);
 				}
 			}

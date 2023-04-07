@@ -66,7 +66,7 @@ b3_condition_and_new(void)
 
     condition_and->condition_and_add = b3_condition_and_add_impl;
 
-    array_new(&(condition_and->condition_arr));
+    cc_array_new(&(condition_and->condition_arr));
   }
 
   return condition_and;
@@ -82,17 +82,17 @@ int
 b3_condition_and_free_impl(b3_condition_t *condition)
 {
   b3_condition_and_t *condition_and;
-  ArrayIter iter;
+  CC_ArrayIter iter;
 	b3_condition_t *condition_iter;
 
   condition_and = (b3_condition_and_t *) condition;
 
-	array_iter_init(&iter, condition_and->condition_arr);
-	while (array_iter_next(&iter, (void*) &condition_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, condition_and->condition_arr);
+	while (cc_array_iter_next(&iter, (void*) &condition_iter) != CC_ITER_END) {
     b3_condition_free(condition_iter);
   }
 
-  array_destroy_cb(condition_and->condition_arr, NULL);
+  cc_array_destroy_cb(condition_and->condition_arr, NULL);
 
   condition_and->super_condition_free(condition);
 
@@ -103,15 +103,15 @@ int
 b3_condition_and_applies_impl(b3_condition_t *condition, b3_director_t *director, b3_win_t *win)
 {
   b3_condition_and_t *condition_and;
-  ArrayIter iter;
+  CC_ArrayIter iter;
 	b3_condition_t *condition_iter;
   int applies;
 
   condition_and = (b3_condition_and_t *) condition;
 
   applies = 1;
-	array_iter_init(&iter, condition_and->condition_arr);
-	while (applies && array_iter_next(&iter, (void*) &condition_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, condition_and->condition_arr);
+	while (applies && cc_array_iter_next(&iter, (void*) &condition_iter) != CC_ITER_END) {
     applies = b3_condition_applies(condition_iter, director, win);
   }
 
@@ -121,7 +121,7 @@ b3_condition_and_applies_impl(b3_condition_t *condition, b3_director_t *director
 int
 b3_condition_and_add_impl(b3_condition_and_t *condition_and, b3_condition_t *new_condition)
 {
-  array_add(condition_and->condition_arr, new_condition);
+  cc_array_add(condition_and->condition_arr, new_condition);
 
   return 0;
 }

@@ -46,7 +46,7 @@ b3_ws_factory_new(void)
 
 	ws_factory = malloc(sizeof(b3_ws_factory_t));
 	if (ws_factory) {
-		array_new(&(ws_factory->ws_arr));
+		cc_array_new(&(ws_factory->ws_arr));
 
 		ws_factory->ws_counter = b3_counter_new(1, 1);
 	}
@@ -57,15 +57,15 @@ b3_ws_factory_new(void)
 int
 b3_ws_factory_free(b3_ws_factory_t *ws_factory)
 {
-	ArrayIter ws_iter;
+	CC_ArrayIter ws_iter;
 	b3_ws_t *ws;
 
-	array_iter_init(&ws_iter, ws_factory->ws_arr);
-	while (array_iter_next(&ws_iter, (void *) &ws) != CC_ITER_END) {
-		array_iter_remove(&ws_iter, NULL);
+	cc_array_iter_init(&ws_iter, ws_factory->ws_arr);
+	while (cc_array_iter_next(&ws_iter, (void *) &ws) != CC_ITER_END) {
+		cc_array_iter_remove(&ws_iter, NULL);
 		b3_ws_free(ws);
 	}
-	array_destroy(ws_factory->ws_arr);
+	cc_array_destroy(ws_factory->ws_arr);
 	ws_factory->ws_arr = NULL;
 
 	b3_counter_free(ws_factory->ws_counter);
@@ -102,7 +102,7 @@ b3_ws_factory_create(b3_ws_factory_t *ws_factory, const char *id)
 	ws = b3_ws_factory_ws_by_id(ws_factory, id);
 	if (ws == NULL) {
 		ws = b3_ws_new(id);
-		array_add(ws_factory->ws_arr, ws);
+		cc_array_add(ws_factory->ws_arr, ws);
 	}
 
 	if (tmp_name) {
@@ -135,14 +135,14 @@ b3_ws_factory_remove(b3_ws_factory_t *ws_factory, const char *id)
 b3_ws_t *
 b3_ws_factory_ws_by_id(b3_ws_factory_t *ws_factory, const char *id)
 {
-	ArrayIter ws_iter;
+	CC_ArrayIter ws_iter;
 	b3_ws_t *ws;
 	char found;
 
 	ws = NULL;
 	found = 0;
-	array_iter_init(&ws_iter, ws_factory->ws_arr);
-	while (!found && array_iter_next(&ws_iter, (void *) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&ws_iter, ws_factory->ws_arr);
+	while (!found && cc_array_iter_next(&ws_iter, (void *) &ws) != CC_ITER_END) {
 		if (strcmp(b3_ws_get_name(ws), id) == 0) {
 			found = 1;
 		}

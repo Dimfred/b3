@@ -92,13 +92,13 @@ b3_director_new(b3_monitor_factory_t *monitor_factory)
 
         director->global_mutex = CreateMutex(NULL, FALSE, NULL);
 
-        array_new(&(director->monitor_arr));
+        cc_array_new(&(director->monitor_arr));
 
         director->ignore_set_foucsed_win = 0;
 
         director->monitor_factory = monitor_factory;
 
-        array_new(&(director->rule_arr));
+        cc_array_new(&(director->rule_arr));
     }
 
 	return director;
@@ -113,15 +113,15 @@ b3_director_free(b3_director_t *director)
 int
 b3_director_free_monitor_arr(b3_director_t *director)
 {
-	ArrayIter monitor_iter;
+	CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 
-	array_iter_init(&monitor_iter, director->monitor_arr);
-	while (array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&monitor_iter, director->monitor_arr);
+	while (cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
 		b3_monitor_free(monitor);
 	}
 
-	array_destroy_cb(director->monitor_arr, NULL);
+	cc_array_destroy_cb(director->monitor_arr, NULL);
 
 	director->monitor_arr = NULL;
 
@@ -131,15 +131,15 @@ b3_director_free_monitor_arr(b3_director_t *director)
 int
 b3_director_free_rule_arr(b3_director_t *director)
 {
-	ArrayIter rule_iter;
+	CC_ArrayIter rule_iter;
 	b3_rule_t *rule;
 
-	array_iter_init(&rule_iter, director->rule_arr);
-	while (array_iter_next(&rule_iter, (void *) &rule) != CC_ITER_END) {
+	cc_array_iter_init(&rule_iter, director->rule_arr);
+	while (cc_array_iter_next(&rule_iter, (void *) &rule) != CC_ITER_END) {
 		b3_rule_free(rule);
 	}
 
-	array_destroy_cb(director->rule_arr, NULL);
+	cc_array_destroy_cb(director->rule_arr, NULL);
 
 	director->rule_arr = NULL;
 
@@ -155,7 +155,7 @@ b3_director_refresh(b3_director_t *director)
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 	b3_director_free_monitor_arr(director);
-	array_new(&(director->monitor_arr));
+	cc_array_new(&(director->monitor_arr));
 
 	EnumDisplayMonitors(NULL, NULL, b3_director_enum_monitors, (LPARAM) director);
 
@@ -190,7 +190,7 @@ b3_director_enum_monitors(HMONITOR wmonitor, HDC hdc, LPRECT rect, LPARAM data)
                                         monitor_info.rcWork,
                                         b3_director_create_ws_switcher(director));
 
-    array_add(director->monitor_arr,
+    cc_array_add(director->monitor_arr,
 	 	      monitor);
     if (director->focused_monitor == NULL) {
     	director->focused_monitor = monitor;
@@ -199,7 +199,7 @@ b3_director_enum_monitors(HMONITOR wmonitor, HDC hdc, LPRECT rect, LPARAM data)
     return TRUE;
 }
 
-Array *
+CC_Array *
 b3_director_get_monitor_arr(b3_director_t *director)
 {
 	return director->monitor_arr;
@@ -208,7 +208,7 @@ b3_director_get_monitor_arr(b3_director_t *director)
 const b3_monitor_t *
 b3_director_get_monitor_by_monitor_name(b3_director_t *director, const char *monitor_name)
 {
-	ArrayIter monitor_iter;
+	CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 	char found;
 
@@ -216,8 +216,8 @@ b3_director_get_monitor_by_monitor_name(b3_director_t *director, const char *mon
 
 	monitor = NULL;
 	found = 0;
-	array_iter_init(&monitor_iter, director->monitor_arr);
-	while (array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END
+	cc_array_iter_init(&monitor_iter, director->monitor_arr);
+	while (cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END
 		   && !found) {
 		if (strcmp(b3_monitor_get_monitor_name(monitor), monitor_name) == 0) {
 			found = 1;
@@ -240,7 +240,7 @@ b3_director_set_focused_monitor(b3_director_t *director, b3_monitor_t *monitor)
 {
 	int error;
 	char managed;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor_iter;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
@@ -248,8 +248,8 @@ b3_director_set_focused_monitor(b3_director_t *director, b3_monitor_t *monitor)
 	error = 0;
 
 	managed = 0;
-	array_iter_init(&iter, director->monitor_arr);
-  while (!managed && array_iter_next(&iter, (void*) &monitor_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, director->monitor_arr);
+  while (!managed && cc_array_iter_next(&iter, (void*) &monitor_iter) != CC_ITER_END) {
     if (monitor_iter == monitor) {
       managed = 1;
     }
@@ -277,15 +277,15 @@ int
 b3_director_set_focused_monitor_by_name(b3_director_t *director, const char *monitor_name)
 {
 	char found;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	int ret;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 	found = 0;
-	array_iter_init(&iter, director->monitor_arr);
-    while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&iter, director->monitor_arr);
+    while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
     	if (strcmp(monitor_name, b3_monitor_get_monitor_name(monitor)) == 0)	{
     		found = 1;
     	}
@@ -312,15 +312,15 @@ int
 b3_director_switch_to_ws(b3_director_t *director, const char *ws_id)
 {
 	char found;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	b3_win_t *focused_win;
   
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 	found = 0;
-	array_iter_init(&iter, director->monitor_arr);
-  while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&iter, director->monitor_arr);
+  while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
     if (b3_monitor_contains_ws(monitor, ws_id))	{
       found = 1;
     }
@@ -354,7 +354,7 @@ b3_director_add_rule(b3_director_t *director, b3_rule_t *rule)
 {
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
-  array_add(director->rule_arr, rule);
+  cc_array_add(director->rule_arr, rule);
 
   ReleaseMutex(director->global_mutex);
 
@@ -364,7 +364,7 @@ b3_director_add_rule(b3_director_t *director, b3_rule_t *rule)
 int
 b3_director_add_win(b3_director_t *director, const char *monitor_name, b3_win_t *win)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	char found;
 	int error;
@@ -373,8 +373,8 @@ b3_director_add_win(b3_director_t *director, const char *monitor_name, b3_win_t 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 	found = 0;
-	array_iter_init(&iter, director->monitor_arr);
-  while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&iter, director->monitor_arr);
+  while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
     if (strcmp(b3_monitor_get_monitor_name(monitor), monitor_name) == 0) {
       found = 1;
     }
@@ -384,8 +384,8 @@ b3_director_add_win(b3_director_t *director, const char *monitor_name, b3_win_t 
   if (found) {
     error = b3_monitor_add_win(monitor, win);
 
-    array_iter_init(&iter, director->rule_arr);
-    while (array_iter_next(&iter, (void*) &rule) != CC_ITER_END) {
+    cc_array_iter_init(&iter, director->rule_arr);
+    while (cc_array_iter_next(&iter, (void*) &rule) != CC_ITER_END) {
       if (b3_rule_applies(rule, director, win)) {
         b3_rule_exec(rule, director, win);
       }
@@ -404,15 +404,15 @@ b3_director_add_win(b3_director_t *director, const char *monitor_name, b3_win_t 
 int
 b3_director_remove_win(b3_director_t *director, b3_win_t *win)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	int error;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 	error = 1;
-	array_iter_init(&iter, director->monitor_arr);
-    while (error && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&iter, director->monitor_arr);
+    while (error && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
     	error = b3_monitor_remove_win(monitor, win);
     }
 
@@ -428,15 +428,15 @@ b3_director_remove_win(b3_director_t *director, b3_win_t *win)
 int
 b3_director_arrange_wins(b3_director_t *director)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	int error;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 	error = 0;
-	array_iter_init(&iter, director->monitor_arr);
-    while (!error && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&iter, director->monitor_arr);
+    while (!error && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
 		error = b3_monitor_arrange_wins(monitor);
     }
 
@@ -448,7 +448,7 @@ b3_director_arrange_wins(b3_director_t *director)
 int
 b3_director_set_active_win(b3_director_t *director, b3_win_t *win)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	char found;
 	b3_ws_t *ws;
@@ -459,8 +459,8 @@ b3_director_set_active_win(b3_director_t *director, b3_win_t *win)
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
 		found = 0;
-		array_iter_init(&iter, director->monitor_arr);
-		while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+		cc_array_iter_init(&iter, director->monitor_arr);
+		while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
 			ws = b3_monitor_find_win(monitor, win);
 			if (ws) {
 				found_win = b3_ws_contains_win(ws, win);
@@ -521,7 +521,7 @@ b3_director_active_win_toggle_floating(b3_director_t *director)
 int
 b3_director_move_active_win_to_ws(b3_director_t *director, const char *ws_id)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor;
 	b3_ws_t *ws;
 	const b3_ws_t *ws_old;
@@ -535,8 +535,8 @@ b3_director_move_active_win_to_ws(b3_director_t *director, const char *ws_id)
     if (active_win) {
 		/** Find the correct monitor to add */
 		found = 0;
-		array_iter_init(&iter, director->monitor_arr);
-		while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+		cc_array_iter_init(&iter, director->monitor_arr);
+		while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
 			ws = b3_monitor_contains_ws(monitor, ws_id);
 			if (ws) {
 				found = 1;
@@ -703,7 +703,7 @@ b3_monitor_t *
 b3_director_get_monitor_by_direction(b3_director_t *director, b3_ws_move_direction_t direction)
 {
 	char found;
-	ArrayIter monitor_iter;
+	CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 	RECT focused_area;
 	RECT other_area;
@@ -712,8 +712,8 @@ b3_director_get_monitor_by_direction(b3_director_t *director, b3_ws_move_directi
 
 	found = 0;
 	focused_area = b3_monitor_get_monitor_area(b3_director_get_focused_monitor(director));
-	array_iter_init(&monitor_iter, b3_director_get_monitor_arr(director));
-	while (!found && array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&monitor_iter, b3_director_get_monitor_arr(director));
+	while (!found && cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
 		if (monitor != b3_director_get_focused_monitor(director)) {
 			other_area = b3_monitor_get_monitor_area(monitor);
 			switch (direction) {
@@ -847,13 +847,13 @@ b3_director_move_focused_win_to_monitor_by_dir(b3_director_t *director, b3_ws_mo
 int
 b3_director_show(b3_director_t *director)
 {
-	ArrayIter monitor_iter;
+	CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
-	array_iter_init(&monitor_iter, director->monitor_arr);
-	while (array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&monitor_iter, director->monitor_arr);
+	while (cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
 		b3_monitor_show(monitor);
 	}
 
@@ -865,13 +865,13 @@ b3_director_show(b3_director_t *director)
 int
 b3_director_draw(b3_director_t *director, HWND window_handler)
 {
-	ArrayIter monitor_iter;
+	CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
-	array_iter_init(&monitor_iter, director->monitor_arr);
-	while (array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&monitor_iter, director->monitor_arr);
+	while (cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
 		b3_monitor_draw(monitor, window_handler);
 	}
 
@@ -906,13 +906,13 @@ b3_director_close_active_win(b3_director_t *director)
 int
 b3_director_remove_empty_ws(b3_director_t *director)
 {
-  ArrayIter monitor_iter;
+  CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 
 	WaitForSingleObject(director->global_mutex, INFINITE);
 
-	array_iter_init(&monitor_iter, director->monitor_arr);
-	while (array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&monitor_iter, director->monitor_arr);
+	while (cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
 		b3_monitor_remove_empty_ws(monitor);
 	}
 
@@ -928,7 +928,7 @@ b3_director_move_win_to_ws(b3_director_t *director, b3_win_t *win, const char *w
 {
   int error;
   char found;
-  ArrayIter iter;
+  CC_ArrayIter iter;
   b3_monitor_t *monitor;
   b3_ws_t *focused_ws;
   b3_ws_t *ws;
@@ -941,8 +941,8 @@ b3_director_move_win_to_ws(b3_director_t *director, b3_win_t *win, const char *w
     focused_ws = b3_monitor_get_focused_ws(b3_director_get_focused_monitor(director));
 
     found = 0;
-    array_iter_init(&iter, director->monitor_arr);
-    while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+    cc_array_iter_init(&iter, director->monitor_arr);
+    while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
       ws = b3_monitor_contains_ws(monitor, ws_id);
       if (ws) {
         found = 1;
@@ -954,8 +954,8 @@ b3_director_move_win_to_ws(b3_director_t *director, b3_win_t *win, const char *w
 
       if (!error) {
         found = 0;
-        array_iter_init(&iter, director->monitor_arr);
-        while (!found && array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
+        cc_array_iter_init(&iter, director->monitor_arr);
+        while (!found && cc_array_iter_next(&iter, (void*) &monitor) != CC_ITER_END) {
           ws = b3_monitor_contains_ws(monitor, ws_id);
           if (ws) {
             found = 1;
@@ -986,7 +986,7 @@ b3_director_split(b3_director_t *director, b3_winman_mode_t mode)
 {
   int error;
   char found;
-  ArrayIter iter;
+  CC_ArrayIter iter;
   b3_monitor_t *monitor;
   b3_ws_t *focused_ws;
   b3_ws_t *ws;
@@ -1123,12 +1123,12 @@ b3_win_t *
 b3_director_get_win_at_pos_impl(b3_director_t *director, POINT *position)
 {
     b3_win_t *win_at_pos;
-    ArrayIter monitor_iter;
+    CC_ArrayIter monitor_iter;
 	b3_monitor_t *monitor;
 
     win_at_pos = NULL;
-	array_iter_init(&monitor_iter, director->monitor_arr);
-	while (win_at_pos == NULL && array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
+	cc_array_iter_init(&monitor_iter, director->monitor_arr);
+	while (win_at_pos == NULL && cc_array_iter_next(&monitor_iter, (void *) &monitor) != CC_ITER_END) {
         win_at_pos = b3_monitor_get_win_at_pos(monitor, position);
 	}
 

@@ -1,5 +1,5 @@
 /******************************************************************************
-  This file is part of b3.
+  This file is part of w32bindkeys.
 
   Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 
@@ -23,59 +23,62 @@
 *******************************************************************************/
 
 /**
- * @author Richard Bäck <richard.baeck@mailbox.org>
- * @date 2020-04-13
- * @brief File contains the window factory class definition
+ * @author Richard Bäck
+ * @date 2020-01-26
+ * @brief File contains the key binding command class definition
  */
 
-#include <collectc/cc_array.h>
-#include <windows.h>
+#include "b.h"
 
-#include "win.h"
+#ifndef WBK_KB_H
+#define WBK_KB_H
 
-#ifndef B3_WIN_FACTORY_H
-#define B3_WIN_FACTORY_H
+typedef struct wbk_kc_s wbk_kc_t;
 
-typedef struct b3_win_factory_s b3_win_factory_t;
-
-struct b3_win_factory_s
+struct wbk_kc_s
 {
-	int (* b3_win_factory_free)(b3_win_factory_t *win_factory);
-	b3_win_t *(* b3_win_factory_win_create)(b3_win_factory_t *win_factory, HWND window_handler);
-	int (* b3_win_factory_win_free)(b3_win_factory_t *win_factory, b3_win_t *win);
+  wbk_kc_t *(*kc_clone)(const wbk_kc_t *other);
+  int (*kc_free)(wbk_kc_t *kc);
+  const wbk_b_t *(*kc_get_binding)(const wbk_kc_t *kc);
+  int (*kc_exec)(const wbk_kc_t *kc);
 
-	HANDLE global_mutex;
-
-	/**
-	 *  CC_Array of b3_win_t *
-	 */
-	CC_Array *win_arr;
+	wbk_b_t *binding;
 };
 
-/**
- * @brief Creates a new window factory
- * @return A new window factory or NULL if allocation failed
- */
-extern b3_win_factory_t *
-b3_win_factory_new(void);
 
 /**
- * @brief Deletes a window factory
- * @return Non-0 if the deletion failed
+ * @brief Creates a new key binding command
+ * @param comb The binding of the key command. The object will be freed by the key binding.
+ * @return A new key binding command or NULL if allocation failed
  */
-extern int
-b3_win_factory_free(b3_win_factory_t *win_factory);
+extern wbk_kc_t *
+wbk_kc_new(wbk_b_t *comb);
 
 /**
- * @return A new window. Free it by yourself by using b3_win_factory_free()!
+ * Clones a key binding command.
  */
-extern b3_win_t *
-b3_win_factory_win_create(b3_win_factory_t *win_factory, HWND window_handler);
+extern wbk_kc_t *
+wbk_kc_clone(const wbk_kc_t *other);
 
 /**
- * @return 0 if the window is managed and freed. Non-0 otherwise.
+ * @brief Frees a key binding command
+ * @return Non-0 if the freeing failed
  */
 extern int
-b3_win_factory_win_free(b3_win_factory_t *win_factory, b3_win_t *win);
+wbk_kc_free(wbk_kc_t *kc);
 
-#endif // B3_WIN_FACTORY_H
+/**
+ * @brief Gets the combinations of a key binding command.
+ * @return The combinations of a key binding command. It is an array of wbk_b_t.
+ */
+extern const wbk_b_t *
+wbk_kc_get_binding(const wbk_kc_t *kc);
+
+/**
+ * @brief Execute the command of a key binding command
+ * @return Non-0 if the execution failed
+ */
+extern int
+wbk_kc_exec(const wbk_kc_t *kc);
+
+#endif // WBK_KB_H

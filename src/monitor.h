@@ -28,7 +28,7 @@
  * @brief File contains the monitor definition
  */
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 #include <windows.h>
 
 #include "bar.h"

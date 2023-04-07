@@ -1,5 +1,5 @@
 /******************************************************************************
-  This file is part of b3.
+  This file is part of w32bindkeys.
 
   Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 
@@ -23,59 +23,46 @@
 *******************************************************************************/
 
 /**
- * @author Richard Bäck <richard.baeck@mailbox.org>
- * @date 2020-04-13
- * @brief File contains the window factory class definition
+ * @author Richard Bäck
+ * @date 2020-02-20
+ * @brief File contains the data finder class definition
  */
+
+#ifndef WBK_DATAFINDER_H
+#define WBK_DATAFINDER_H
 
 #include <collectc/cc_array.h>
-#include <windows.h>
 
-#include "win.h"
-
-#ifndef B3_WIN_FACTORY_H
-#define B3_WIN_FACTORY_H
-
-typedef struct b3_win_factory_s b3_win_factory_t;
-
-struct b3_win_factory_s
+typedef struct wbk_datafinder_s
 {
-	int (* b3_win_factory_free)(b3_win_factory_t *win_factory);
-	b3_win_t *(* b3_win_factory_win_create)(b3_win_factory_t *win_factory, HWND window_handler);
-	int (* b3_win_factory_win_free)(b3_win_factory_t *win_factory, b3_win_t *win);
+	/**
+	 * CC_Array of char *
+	 */
+	CC_Array *datadir_arr;
 
-	HANDLE global_mutex;
+	char *execdir;
 
 	/**
-	 *  CC_Array of b3_win_t *
+	 * Length of exec_dir. It includes the terminating byte.
 	 */
-	CC_Array *win_arr;
-};
+	int execdir_len;
+} wbk_datafinder_t;
 
-/**
- * @brief Creates a new window factory
- * @return A new window factory or NULL if allocation failed
- */
-extern b3_win_factory_t *
-b3_win_factory_new(void);
+extern wbk_datafinder_t *
+wbk_datafinder_new(const char *datadir);
 
-/**
- * @brief Deletes a window factory
- * @return Non-0 if the deletion failed
- */
 extern int
-b3_win_factory_free(b3_win_factory_t *win_factory);
+wbk_datafinder_free(wbk_datafinder_t *datafinder);
 
-/**
- * @return A new window. Free it by yourself by using b3_win_factory_free()!
- */
-extern b3_win_t *
-b3_win_factory_win_create(b3_win_factory_t *win_factory, HWND window_handler);
-
-/**
- * @return 0 if the window is managed and freed. Non-0 otherwise.
- */
 extern int
-b3_win_factory_win_free(b3_win_factory_t *win_factory, b3_win_t *win);
+wbk_datafinder_add_datadir(wbk_datafinder_t *datafinder, const char *datadir);
 
-#endif // B3_WIN_FACTORY_H
+/**
+ * @param data_file The base name of a file to search for.
+ * @return A new string containing the absolute path to data_file, free it
+ *         yourself. If NULL, then the file could not be found.
+ */
+extern char *
+wbk_datafinder_gen_path(const wbk_datafinder_t *datafinder, const char *data_file);
+
+#endif // WBK_DATAFINDER_H

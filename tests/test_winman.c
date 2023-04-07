@@ -39,7 +39,7 @@ static char g_arr[ARR_LEN];
 
 static void
 visitor(b3_winman_t *winman, void *data) {
-	if (array_size(b3_winman_get_winman_arr(winman)) != 0) {
+	if (cc_array_size(b3_winman_get_winman_arr(winman)) != 0) {
 		g_arr[g_arr_i] = 'I';
 	} else  {
 		g_arr[g_arr_i] = 'L';

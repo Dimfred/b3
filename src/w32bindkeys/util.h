@@ -1,5 +1,5 @@
 /******************************************************************************
-  This file is part of b3.
+  This file is part of w32bindkeys.
 
   Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 
@@ -23,59 +23,38 @@
 *******************************************************************************/
 
 /**
- * @author Richard Bäck <richard.baeck@mailbox.org>
- * @date 2020-04-13
- * @brief File contains the window factory class definition
+ * @author Richard BÃ¤ck
+ * @date 29 January 2020
+ * @brief File contains utility functions
  */
+
+#ifndef WBK_UTIL_H
+#define WBK_UTIL_H
 
 #include <collectc/cc_array.h>
-#include <windows.h>
-
-#include "win.h"
-
-#ifndef B3_WIN_FACTORY_H
-#define B3_WIN_FACTORY_H
-
-typedef struct b3_win_factory_s b3_win_factory_t;
-
-struct b3_win_factory_s
-{
-	int (* b3_win_factory_free)(b3_win_factory_t *win_factory);
-	b3_win_t *(* b3_win_factory_win_create)(b3_win_factory_t *win_factory, HWND window_handler);
-	int (* b3_win_factory_win_free)(b3_win_factory_t *win_factory, b3_win_t *win);
-
-	HANDLE global_mutex;
-
-	/**
-	 *  CC_Array of b3_win_t *
-	 */
-	CC_Array *win_arr;
-};
+#include <stdio.h>
 
 /**
- * @brief Creates a new window factory
- * @return A new window factory or NULL if allocation failed
+ * @return A new string. Free it by yourself.
  */
-extern b3_win_factory_t *
-b3_win_factory_new(void);
+extern char *
+wbk_intarr_to_str(CC_Array *array);
 
 /**
- * @brief Deletes a window factory
- * @return Non-0 if the deletion failed
+ * @brief Produces an absolute path to the home directory
+ * @return A new string. Free it by yourself.
  */
+extern char *
+wbk_get_path_of_home(void);
+
+/**
+ * @brief Produces an absolute path from the home directory
+ * @return A new string. Free it by yourself.
+ */
+extern char *
+wbk_path_from_home(const char *relative_path);
+
 extern int
-b3_win_factory_free(b3_win_factory_t *win_factory);
+wbk_write_file(const char *src_path, FILE *dest);
 
-/**
- * @return A new window. Free it by yourself by using b3_win_factory_free()!
- */
-extern b3_win_t *
-b3_win_factory_win_create(b3_win_factory_t *win_factory, HWND window_handler);
-
-/**
- * @return 0 if the window is managed and freed. Non-0 otherwise.
- */
-extern int
-b3_win_factory_win_free(b3_win_factory_t *win_factory, b3_win_t *win);
-
-#endif // B3_WIN_FACTORY_H
+#endif // WBK_UTIL_H

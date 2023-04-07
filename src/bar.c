@@ -26,8 +26,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <collectc/hashtable.h>
-#include <collectc/array.h>
+#include <collectc/cc_hashtable.h>
+#include <collectc/cc_array.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <w32bindkeys/logger.h>

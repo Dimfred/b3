@@ -50,7 +50,7 @@ b3_winman_add_winman_impl(b3_winman_t *root, b3_winman_t *winman);
 static int
 b3_winman_remove_winman_impl(b3_winman_t *root, b3_winman_t *winman);
 
-static Array *
+static CC_Array *
 b3_winman_get_winman_arr_impl(b3_winman_t *winman);
 
 static int
@@ -111,7 +111,7 @@ b3_winman_new(b3_winman_mode_t mode)
 		winman->b3_winman_get_maximized = b3_winman_get_maximized_impl;
 		winman->b3_winman_get_win_at_pos = b3_winman_get_win_at_pos_impl;
 
-		array_new(&(winman->winman_arr));
+		cc_array_new(&(winman->winman_arr));
 		winman->win = NULL;
 		winman->mode = mode;
 	}
@@ -145,7 +145,7 @@ b3_winman_remove_winman(b3_winman_t *root, b3_winman_t *winman)
 	return winman->b3_winman_remove_winman(root, winman);
 }
 
-Array *
+CC_Array *
 b3_winman_get_winman_arr(b3_winman_t *winman)
 {
 	return winman->b3_winman_get_winman_arr(winman);
@@ -217,19 +217,19 @@ b3_winman_get_win_at_pos(b3_winman_t *winman, POINT *position)
 int
 b3_winman_free_impl(b3_winman_t *winman)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 	b3_win_t *win_iter;
 
 	/**
 	 * Remove and traverse all window manager objects
 	 */
-	array_iter_init(&iter, winman->winman_arr);
-    while (array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
-    	array_iter_remove(&iter, NULL);
+	cc_array_iter_init(&iter, winman->winman_arr);
+    while (cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+    	cc_array_iter_remove(&iter, NULL);
     	b3_winman_free(winman_iter);
     }
-	array_destroy(winman->winman_arr);
+	cc_array_destroy(winman->winman_arr);
 	winman->winman_arr = NULL;
 
 	winman->win = NULL;
@@ -244,13 +244,13 @@ b3_winman_traverse_impl(b3_winman_t *winman,
 						 void visitor(b3_winman_t *winman, void *data),
 						 void *data)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	visitor(winman, data);
 
-	array_iter_init(&iter, b3_winman_get_winman_arr(winman));
-	while (array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_winman_get_winman_arr(winman));
+	while (cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 		b3_winman_traverse(winman_iter, visitor, data);
 	}
 }
@@ -260,7 +260,7 @@ b3_winman_add_winman_impl(b3_winman_t *root, b3_winman_t *winman)
 {
 	int error;
 
-	error = array_add(root->winman_arr, winman);
+	error = cc_array_add(root->winman_arr, winman);
 
 	return error;
 }
@@ -270,16 +270,16 @@ b3_winman_remove_winman_impl(b3_winman_t *root, b3_winman_t *winman)
 {
 	int error;
 	b3_winman_t *container;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	error = 1;
 	container = b3_winman_get_parent(root, winman);
 	if (container) {
-		array_iter_init(&iter, b3_winman_get_winman_arr(container));
-		while (error && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_winman_get_winman_arr(container));
+		while (error && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 			if (winman_iter == winman) {
-				array_iter_remove(&iter, NULL);
+				cc_array_iter_remove(&iter, NULL);
 				error = 0;
 			}
 		}
@@ -288,7 +288,7 @@ b3_winman_remove_winman_impl(b3_winman_t *root, b3_winman_t *winman)
 	return error;
 }
 
-Array *
+CC_Array *
 b3_winman_get_winman_arr_impl(b3_winman_t *winman)
 {
 	return winman->winman_arr;
@@ -317,13 +317,13 @@ b3_winman_t *
 b3_winman_get_parent_impl(b3_winman_t *root, b3_winman_t *winman)
 {
 	b3_winman_t *container;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	container = NULL;
 
-	array_iter_init(&iter, b3_winman_get_winman_arr(root));
-	while (container == NULL && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_winman_get_winman_arr(root));
+	while (container == NULL && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 		if (winman_iter == winman) {
 			container = root;
 		} else {
@@ -339,7 +339,7 @@ b3_winman_contains_win_impl(b3_winman_t *winman, const b3_win_t *win)
 {
 	b3_winman_t *container;
 	b3_win_t *winman_win;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	container = NULL;
@@ -351,8 +351,8 @@ b3_winman_contains_win_impl(b3_winman_t *winman, const b3_win_t *win)
 	}
 
 	if (container == NULL) {
-		array_iter_init(&iter, b3_winman_get_winman_arr(winman));
-		while (container == NULL && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_winman_get_winman_arr(winman));
+		while (container == NULL && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 			container = b3_winman_contains_win(winman_iter, win);
 		}
 	}
@@ -374,10 +374,10 @@ b3_winman_get_winman_rel_to_winman_impl(b3_winman_t *root,
 
 	found = NULL;
 
-	arr_len = array_size(b3_winman_get_winman_arr(root));
+	arr_len = cc_array_size(b3_winman_get_winman_arr(root));
 	found_pos = -1;
 	for (i = 0; found_pos < 0 && i < arr_len; i++) {
-		array_get_at(b3_winman_get_winman_arr(root), i, (void *) &winman_iter);
+		cc_array_get_at(b3_winman_get_winman_arr(root), i, (void *) &winman_iter);
 		if (winman_iter == winman) {
 			found_pos = i;
 		}
@@ -405,7 +405,7 @@ b3_winman_get_winman_rel_to_winman_impl(b3_winman_t *root,
 	}
 
 	if (found_pos >= 0 && found_pos < arr_len) {
-		array_get_at(b3_winman_get_winman_arr(root), found_pos, (void *) &found);
+		cc_array_get_at(b3_winman_get_winman_arr(root), found_pos, (void *) &found);
 	}
 
 	return found;
@@ -415,15 +415,15 @@ int
 b3_winman_is_empty_impl(b3_winman_t *root, char check_deeply)
 {
 	int is_empty;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	is_empty = 0;
 
 	if (b3_winman_get_win(root) == NULL) {
 		is_empty = 1;
-		array_iter_init(&iter, b3_winman_get_winman_arr(root));
-		while (is_empty && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_winman_get_winman_arr(root));
+		while (is_empty && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 			if (b3_winman_get_win(winman_iter)) {
 				is_empty = 0;
 			} else if (check_deeply) {
@@ -439,15 +439,15 @@ int
 b3_winman_reorg_impl(b3_winman_t *winman)
 {
 	int error;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	error = 0;
 
-	array_iter_init(&iter, b3_winman_get_winman_arr(winman));
-	while (!error && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_winman_get_winman_arr(winman));
+	while (!error && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 		if (b3_winman_is_empty(winman_iter, 1)) {
-			array_iter_remove(&iter, NULL);
+			cc_array_iter_remove(&iter, NULL);
 		} else {
 			error = b3_winman_reorg(winman_iter);
 		}
@@ -460,7 +460,7 @@ b3_win_t *
 b3_winman_get_maximized_impl(b3_winman_t *winman)
 {
 	b3_win_t *maximized;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	maximized = b3_winman_get_win(winman);
@@ -469,8 +469,8 @@ b3_winman_get_maximized_impl(b3_winman_t *winman)
 			maximized = NULL;
 		}
 	} else {
-		array_iter_init(&iter, b3_winman_get_winman_arr(winman));
-		while (maximized == NULL && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_winman_get_winman_arr(winman));
+		while (maximized == NULL && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 			maximized = b3_winman_get_maximized(winman_iter);
 		}
 	}
@@ -482,7 +482,7 @@ b3_win_t *
 b3_winman_get_win_at_pos_impl(b3_winman_t *winman, POINT *position)
 {
 	b3_win_t *win_at_pos;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_winman_t *winman_iter;
 
 	win_at_pos = b3_winman_get_win(winman);
@@ -491,8 +491,8 @@ b3_winman_get_win_at_pos_impl(b3_winman_t *winman, POINT *position)
 			win_at_pos = NULL;
 		}
 	} else {
-		array_iter_init(&iter, b3_winman_get_winman_arr(winman));
-		while (win_at_pos == NULL && array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_winman_get_winman_arr(winman));
+		while (win_at_pos == NULL && cc_array_iter_next(&iter, (void*) &winman_iter) != CC_ITER_END) {
 			win_at_pos = b3_winman_get_win_at_pos_impl(winman_iter, position);
 		}
 	}

@@ -1,7 +1,7 @@
 /******************************************************************************
-  This file is part of b3.
+  This file is part of w32bindkeys.
 
-  Copyright 2020-2021 Richard Paul Baeck <richard.baeck@mailbox.org>
+  Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -23,49 +23,34 @@
 *******************************************************************************/
 
 /**
- * @author Richard Bäck <richard.baeck@mailbox.org>
- * @date 2020-01-03
- * @brief File contains the action list class definition
- *
- * b3_action_list_t inherits all methods of b3_action_t (see action.h).
+ * @author Richard Bäck
+ * @date 30 January 2020
+ * @brief File contains the logger class definition
  */
 
-#ifndef B3_ACTION_LIST_H
-#define B3_ACTION_LIST_H
+#ifndef WBK_LOGGER_H
+#define WBK_LOGGER_H
 
-#include "action.h"
-
-#include <collectc/cc_array.h>
-
-#include "director.h"
-#include "win.h"
-
-typedef struct b3_action_list_s b3_action_list_t;
-
-struct b3_action_list_s
+typedef enum wbk_loglevel_e
 {
-  b3_action_t action;
-  int (*super_action_free)(b3_action_t *action);
-  int (*super_action_exec)(b3_action_t *action, b3_director_t *director, b3_win_t *win);
+	DEBUG = 0,
+	INFO,
+	WARNING,
+	SEVERE
+} wbk_loglevel_t;
 
-  int (*action_cc_list_add)(b3_action_list_t *action_list, b3_action_t *new_action);
+typedef struct wbk_logger_s
+{
+	char name[255];
+} wbk_logger_t;
 
-	/**
-	 * CC_Array of b3_action_t *
-	 */
-	CC_Array *action_arr;
-};
-
-extern b3_action_list_t *
-b3_action_list_new(void);
-
-/**
- * Adds a new action.
- *
- * @param new_action The action will be freed by the action list object! Do not
- * free it by yourself!
- */
 extern int
-b3_action_cc_list_add(b3_action_list_t *action_list, b3_action_t *new_action);
+wbk_logger_set_level(wbk_loglevel_t level);
 
-#endif // B3_ACTION_LIST_H
+extern int
+wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...);
+
+extern int
+wbk_logger_err(wbk_logger_t *logger, const char *fmt, ...);
+
+#endif // WBK_LOGGER_H

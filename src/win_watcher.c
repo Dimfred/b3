@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <w32bindkeys/logger.h>
 #include <windows.h>
-#include <collectc/hashtable.h>
+#include <collectc/cc_hashtable.h>
 
 typedef struct b3_win_watcher_win_focused_comm_s
 {
@@ -405,7 +405,7 @@ b3_win_watcher_managable_window_handler_impl(b3_win_watcher_t *win_watcher, HWND
 	HWND window_owner;
 	HWND parent;
 	RECT rect;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_monitor_t *monitor_iter;
 	int parent_managable;
 	int ret;
@@ -422,8 +422,8 @@ b3_win_watcher_managable_window_handler_impl(b3_win_watcher_t *win_watcher, HWND
 		GetClassName(window_handler, classname, B3_WIN_WATCHER_BUFFER_LENGTH);
 
 		ret = 1;
-		array_iter_init(&iter, b3_director_get_monitor_arr(win_watcher->director));
-		while (ret && array_iter_next(&iter, (void*) &monitor_iter) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_director_get_monitor_arr(win_watcher->director));
+		while (ret && cc_array_iter_next(&iter, (void*) &monitor_iter) != CC_ITER_END) {
 			GetWindowText(b3_monitor_get_bar(monitor_iter)->window_handler, iter_title, B3_WIN_WATCHER_BUFFER_LENGTH);
 			if (strcmp(title, iter_title) == 0) {
 				ret = 0;

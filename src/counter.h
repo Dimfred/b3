@@ -28,7 +28,7 @@
  * @brief File contains the counter definition
  */
 
-#include <collectc/list.h>
+#include <collectc/cc_list.h>
 
 #ifndef B3_COUNTER_H
 #define B3_COUNTER_H
@@ -39,9 +39,9 @@ typedef struct b3_counter_s
 	int reenable;
 
 	/**
-	 * List of int *
+	 * CC_List of int *
 	 */
-	List *reenabled_ones;
+	CC_List *reenabled_ones;
 } b3_counter_t;
 
 extern b3_counter_t *

@@ -31,7 +31,7 @@
 #ifndef B3_WINMAN_H
 #define B3_WINMAN_H
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 
 #include "win.h"
 
@@ -57,7 +57,7 @@ struct b3_winman_s {
 							   void *data);
 	int (*b3_winman_add_winman)(b3_winman_t *root, b3_winman_t *winman);
 	int (*b3_winman_remove_winman)(b3_winman_t *root, b3_winman_t *winman);
-	Array *(*b3_winman_get_winman_arr)(b3_winman_t *winman);
+	CC_Array *(*b3_winman_get_winman_arr)(b3_winman_t *winman);
 	int (*b3_winman_set_win)(b3_winman_t *winman, b3_win_t *win);
 	b3_win_t *(*b3_winman_get_win)(b3_winman_t *winman);
 	b3_winman_mode_t (*b3_winman_get_mode)(b3_winman_t *winman);
@@ -73,9 +73,9 @@ struct b3_winman_s {
 	b3_win_t *(*b3_winman_get_win_at_pos)(b3_winman_t *winman, POINT *position);
 
 	/**
-	 * Array of b3_winman_t
+	 * CC_Array of b3_winman_t
 	 */
-	Array *winman_arr;
+	CC_Array *winman_arr;
 
 	b3_win_t *win;
 
@@ -138,7 +138,7 @@ b3_winman_remove_winman(b3_winman_t *root, b3_winman_t *winman);
   *
   * @return A pointer to the window managers. Do not free that memory.
   */
-extern Array *
+extern CC_Array *
 b3_winman_get_winman_arr(b3_winman_t *winman);
 
 /**

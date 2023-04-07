@@ -35,7 +35,7 @@
 
 #include "action.h"
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 
 #include "director.h"
 #include "win.h"

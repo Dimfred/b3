@@ -32,7 +32,7 @@
 #define B3_WSMAN_H
 
 #include <windows.h>
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 
 #include "ws_factory.h"
 
@@ -51,9 +51,9 @@ struct b3_wsman_s
 	b3_ws_t *focused_ws;
 
 	/**
-	 * Array of b3_ws_t *
+	 * CC_Array of b3_ws_t *
 	 */
-	Array *ws_arr;
+	CC_Array *ws_arr;
 };
 
 /**

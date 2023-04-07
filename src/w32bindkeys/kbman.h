@@ -1,5 +1,5 @@
 /******************************************************************************
-  This file is part of b3.
+  This file is part of w32bindkeys.
 
   Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 
@@ -23,59 +23,58 @@
 *******************************************************************************/
 
 /**
- * @author Richard Bäck <richard.baeck@mailbox.org>
- * @date 2020-04-13
- * @brief File contains the window factory class definition
+ * @author Richard BÃ¤ck
+ * @date 29 January 2020
+ * @brief File contains interpreter keyboard manager class definition
  */
 
-#include <collectc/cc_array.h>
+#ifndef WBK_KBMAN_H
+#define WBK_KBMAN_H
+
 #include <windows.h>
 
-#include "win.h"
+#include "kc.h"
+typedef struct wbk_kbman_s wbk_kbman_t;
 
-#ifndef B3_WIN_FACTORY_H
-#define B3_WIN_FACTORY_H
-
-typedef struct b3_win_factory_s b3_win_factory_t;
-
-struct b3_win_factory_s
+struct wbk_kbman_s
 {
-	int (* b3_win_factory_free)(b3_win_factory_t *win_factory);
-	b3_win_t *(* b3_win_factory_win_create)(b3_win_factory_t *win_factory, HWND window_handler);
-	int (* b3_win_factory_win_free)(b3_win_factory_t *win_factory, b3_win_t *win);
+  wbk_kbman_t *(*kbman_free)(wbk_kbman_t *kbman);
+  int (*kbman_add)(wbk_kbman_t *kbman, wbk_kc_t *kc);
+  wbk_kbman_t **(*kbman_split)(wbk_kbman_t *kbman, int nominator);
+  int (*kbman_exec)(wbk_kbman_t *kbman, wbk_b_t *b);
 
-	HANDLE global_mutex;
-
-	/**
-	 *  CC_Array of b3_win_t *
-	 */
-	CC_Array *win_arr;
+	int kc_arr_len;
+	wbk_kc_t **kc_arr;
 };
 
 /**
- * @brief Creates a new window factory
- * @return A new window factory or NULL if allocation failed
  */
-extern b3_win_factory_t *
-b3_win_factory_new(void);
+extern wbk_kbman_t *
+wbk_kbman_new();
+
+extern wbk_kbman_t *
+wbk_kbman_free(wbk_kbman_t *kbman);
 
 /**
- * @brief Deletes a window factory
- * @return Non-0 if the deletion failed
+ * @param kb The key binding to add. The added key binding will be freed by the key binding manager
  */
 extern int
-b3_win_factory_free(b3_win_factory_t *win_factory);
+wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_t *kc);
 
 /**
- * @return A new window. Free it by yourself by using b3_win_factory_free()!
+ * Create an array of nominator new key board managers and divide the internal
+ * key commands by nominator over those new key board managers. The key commands
+ * are copied during this processes. The returned array and the returned key
+ * board managers need to be freed by yourself!
  */
-extern b3_win_t *
-b3_win_factory_win_create(b3_win_factory_t *win_factory, HWND window_handler);
+extern wbk_kbman_t **
+wbk_kbman_split(wbk_kbman_t *kbman, int nominator);
 
 /**
- * @return 0 if the window is managed and freed. Non-0 otherwise.
+ * @brief Execute a key binding matching a combination
+ * @return Non-0 if the combination was not found.
  */
 extern int
-b3_win_factory_win_free(b3_win_factory_t *win_factory, b3_win_t *win);
+wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b);
 
-#endif // B3_WIN_FACTORY_H
+#endif // WBK_KBMAN_H

@@ -31,7 +31,7 @@
 #ifndef B3_WS_H
 #define B3_WS_H
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 #include <windows.h>
 
 #include "til.h"
@@ -87,7 +87,7 @@ struct b3_ws_s {
 	b3_win_t *focused_win_tree;
 
 	/**
-	 * Array of b3_win_t *
+	 * CC_Array of b3_win_t *
 	 *
 	 * Stack containing the previously focused windows. If a window is removed,
 	 * then it is also removed from the previously focused windows.
@@ -97,14 +97,14 @@ struct b3_ws_s {
 	 * - floating_win_arr
 	 * - winman
 	 */
-	Array *previously_focused_win_arr;
+	CC_Array *previously_focused_win_arr;
 
 	/**
-	 * Array of b3_win_t *
+	 * CC_Array of b3_win_t *
 	 *
-	 * Array containing the floating windows.
+	 * CC_Array containing the floating windows.
 	 */
-	Array *floating_win_arr;
+	CC_Array *floating_win_arr;
 };
 
 /**

@@ -1,7 +1,7 @@
 /******************************************************************************
-  This file is part of b3.
+  This file is part of w32bindkeys.
 
-  Copyright 2020-2021 Richard Paul Baeck <richard.baeck@mailbox.org>
+  Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -23,49 +23,46 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck <richard.baeck@mailbox.org>
- * @date 2020-01-03
- * @brief File contains the action list class definition
+ * @author Richard Bäck
+ * @date 2020-02-26
+ * @brief File contains the key binding system command class definition
  *
- * b3_action_list_t inherits all methods of b3_action_t (see action.h).
+ * wbk_kc_sys_t inherits all methods of wkb_kc_t (see kc.h).
  */
 
-#ifndef B3_ACTION_LIST_H
-#define B3_ACTION_LIST_H
+#include "kc.h"
 
-#include "action.h"
+#ifndef WBK_KC_SYS_H
+#define WBK_KC_SYS_H
 
-#include <collectc/cc_array.h>
+typedef struct wbk_kc_sys_s wbk_kc_sys_t;
 
-#include "director.h"
-#include "win.h"
-
-typedef struct b3_action_list_s b3_action_list_t;
-
-struct b3_action_list_s
+struct wbk_kc_sys_s
 {
-  b3_action_t action;
-  int (*super_action_free)(b3_action_t *action);
-  int (*super_action_exec)(b3_action_t *action, b3_director_t *director, b3_win_t *win);
+	wbk_kc_t kc;
+  wbk_kc_t *(*super_kc_clone)(const wbk_kc_t *other);
+  int (*super_kc_free)(wbk_kc_t *kc);
+  int (*super_kc_exec)(const wbk_kc_t *kc);
 
-  int (*action_cc_list_add)(b3_action_list_t *action_list, b3_action_t *new_action);
+  const char *(*kc_sys_get_cmd)(const wbk_kc_sys_t *kc_sys);
 
-	/**
-	 * CC_Array of b3_action_t *
-	 */
-	CC_Array *action_arr;
+	char *cmd;
 };
 
-extern b3_action_list_t *
-b3_action_list_new(void);
+/**
+ * @brief Creates a new key binding system command
+ * @param comb The binding of the key command. The object will be freed by the key binding.
+ * @param cmd The system command of the key command. The passed string will be freed by the key binding.
+ * @return A new key binding command or NULL if allocation failed
+ */
+extern wbk_kc_sys_t *
+wbk_kc_sys_new(wbk_b_t *comb, char *cmd);
 
 /**
- * Adds a new action.
- *
- * @param new_action The action will be freed by the action list object! Do not
- * free it by yourself!
+ * @brief Gets the command of a key binding system command.
+ * @return The command of a key binding system command.
  */
-extern int
-b3_action_cc_list_add(b3_action_list_t *action_list, b3_action_t *new_action);
+extern const char *
+wbk_kc_sys_get_cmd(const wbk_kc_sys_t *kc_sys);
 
-#endif // B3_ACTION_LIST_H
+#endif // WBK_KC_SYS_H

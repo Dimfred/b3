@@ -47,7 +47,7 @@ static wbk_logger_t logger = { "wsman" };
  * @return The workspace array of the workspace manager. Do not free it or
  * any element of it!
  */
-static Array *
+static CC_Array *
 b3_wsman_get_ws_arr(b3_wsman_t *wsman);
 
 static int
@@ -74,10 +74,10 @@ b3_wsman_new(b3_ws_factory_t *ws_factory)
 
         wsman->ws_factory = ws_factory;
 
-        array_new(&(wsman->ws_arr));
+        cc_array_new(&(wsman->ws_arr));
 
         wsman->focused_ws = b3_ws_factory_create(wsman->ws_factory, NULL);
-        array_add(b3_wsman_get_ws_arr(wsman),
+        cc_array_add(b3_wsman_get_ws_arr(wsman),
                   wsman->focused_ws);
     }
 
@@ -94,15 +94,15 @@ b3_ws_t *
 b3_wsman_add(b3_wsman_t *wsman, const char *ws_id)
 {
 	char found;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_ws_t *ws;
 
 	WaitForSingleObject(wsman->global_mutex, INFINITE);
 
 	found = 0;
 	ws = NULL;
-	array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-    while (!found && array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+    while (!found && cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
     	if (strcmp(b3_ws_get_name(ws), ws_id) == 0)	{
     		found = 1;
     	}
@@ -110,8 +110,8 @@ b3_wsman_add(b3_wsman_t *wsman, const char *ws_id)
 
     if (!found) {
     	ws = b3_ws_factory_create(wsman->ws_factory, ws_id);
-    	array_add(b3_wsman_get_ws_arr(wsman), ws);
-    	array_sort(b3_wsman_get_ws_arr(wsman), b3_wsman_ws_comparator);
+    	cc_array_add(b3_wsman_get_ws_arr(wsman), ws);
+    	cc_array_sort(b3_wsman_get_ws_arr(wsman), b3_wsman_ws_comparator);
     }
 
     ReleaseMutex(wsman->global_mutex);
@@ -123,7 +123,7 @@ int
 b3_wsman_remove(b3_wsman_t *wsman, const char *ws_id)
 {
 	char found;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_ws_t *ws;
 	b3_ws_t *new_focused_ws;
 	int ret;
@@ -132,10 +132,10 @@ b3_wsman_remove(b3_wsman_t *wsman, const char *ws_id)
 
 	found = 0;
     ret = 1;
-	array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-    while (!found && array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+    while (!found && cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
     	if (strcmp(b3_ws_get_name(ws), ws_id) == 0)	{
-            array_iter_remove(&iter, NULL);
+            cc_array_iter_remove(&iter, NULL);
     		found = 1;
     		ret = 0;
     	}
@@ -143,8 +143,8 @@ b3_wsman_remove(b3_wsman_t *wsman, const char *ws_id)
 
     if (found) {
 		if (b3_wsman_get_focused_ws(wsman) == ws) {
-			if (array_size(b3_wsman_get_ws_arr(wsman))) {
-				array_get_at(b3_wsman_get_ws_arr(wsman), 0, (void *) &new_focused_ws);
+			if (cc_array_size(b3_wsman_get_ws_arr(wsman))) {
+				cc_array_get_at(b3_wsman_get_ws_arr(wsman), 0, (void *) &new_focused_ws);
 			} else {
 				new_focused_ws = b3_wsman_add(wsman, NULL);
 			}
@@ -161,14 +161,14 @@ b3_ws_t *
 b3_wsman_contains_ws(b3_wsman_t *wsman, const char *ws_id)
 {
 	int found;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_ws_t *ws;
 
 	WaitForSingleObject(wsman->global_mutex, INFINITE);
 
 	found = 0;
-	array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-    while (!found && array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+    while (!found && cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
     	if (strcmp(b3_ws_get_name(ws), ws_id) == 0)	{
     		found = 1;
     	}
@@ -202,7 +202,7 @@ b3_wsman_set_focused_ws(b3_wsman_t *wsman, const char *ws_id)
 {
 	int error;
 	int found;
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_ws_t *ws;
 	b3_ws_t *old_focused_ws;
 
@@ -212,8 +212,8 @@ b3_wsman_set_focused_ws(b3_wsman_t *wsman, const char *ws_id)
 	old_focused_ws = b3_wsman_get_focused_ws(wsman);
 	if (strcmp(b3_ws_get_name(wsman->focused_ws), ws_id) != 0) {
 		found = 0;
-		array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-		while (!found && array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+		cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+		while (!found && cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
 			if (strcmp(b3_ws_get_name(ws), ws_id) == 0)	{
 				found = 1;
 			}
@@ -243,7 +243,7 @@ b3_wsman_set_focused_ws(b3_wsman_t *wsman, const char *ws_id)
 int
 b3_wsman_remove_win(b3_wsman_t *wsman, b3_win_t *win)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_ws_t *ws;
 	int ret;
 
@@ -251,8 +251,8 @@ b3_wsman_remove_win(b3_wsman_t *wsman, b3_win_t *win)
 
   ret = 1;
 
-	array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-	while (array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+	while (cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
 		if (b3_ws_remove_win(ws, win) == 0) {
 			ret = 0;
 		}
@@ -266,15 +266,15 @@ b3_wsman_remove_win(b3_wsman_t *wsman, b3_win_t *win)
 b3_ws_t *
 b3_wsman_find_win(b3_wsman_t *wsman, const b3_win_t *win)
 {
-	ArrayIter iter;
+	CC_ArrayIter iter;
 	b3_ws_t *ws;
 	char found;
 
   WaitForSingleObject(wsman->global_mutex, INFINITE);
 
 	found = 0;
-	array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-	while (!found && array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+	while (!found && cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
 		if (b3_ws_contains_win(ws, win)) {
 			found = 1;
 		}
@@ -314,9 +314,9 @@ b3_wsman_remove_empty_ws(b3_wsman_t *wsman)
   WaitForSingleObject(wsman->global_mutex, INFINITE);
 
   i = 0;
-  len = array_size(b3_wsman_get_ws_arr(wsman));
+  len = cc_array_size(b3_wsman_get_ws_arr(wsman));
   while (i < len) {
-    array_get_at(b3_wsman_get_ws_arr(wsman), i, (void *) &ws);
+    cc_array_get_at(b3_wsman_get_ws_arr(wsman), i, (void *) &ws);
 
     if (b3_wsman_get_focused_ws(wsman) != ws && b3_ws_get_focused_win(ws) == NULL) {
 			b3_wsman_remove(wsman, b3_ws_get_name(ws));
@@ -324,7 +324,7 @@ b3_wsman_remove_empty_ws(b3_wsman_t *wsman)
       ws = NULL;
 
       i = -1;
-      len = array_size(b3_wsman_get_ws_arr(wsman));
+      len = cc_array_size(b3_wsman_get_ws_arr(wsman));
 		}
 
     i++;
@@ -335,10 +335,10 @@ b3_wsman_remove_empty_ws(b3_wsman_t *wsman)
   return 0;
 }
 
-Array *
+CC_Array *
 b3_wsman_get_ws_arr(b3_wsman_t *wsman)
 {
-  Array *ws_arr;
+  CC_Array *ws_arr;
 
 	ws_arr = wsman->ws_arr;
 
@@ -348,13 +348,13 @@ b3_wsman_get_ws_arr(b3_wsman_t *wsman)
 int
 b3_wsman_iterate_ws_arr(b3_wsman_t *wsman, void (*visitor)(b3_ws_t *ws))
 {
-  ArrayIter iter;
+  CC_ArrayIter iter;
 	b3_ws_t *ws;
 
   WaitForSingleObject(wsman->global_mutex, INFINITE);
 
-	array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
-	while (array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
+	cc_array_iter_init(&iter, b3_wsman_get_ws_arr(wsman));
+	while (cc_array_iter_next(&iter, (void*) &ws) != CC_ITER_END) {
     visitor(ws);
   }
 
@@ -384,7 +384,7 @@ b3_wsman_free_impl(b3_wsman_t *wsman)
 	ReleaseMutex(wsman->global_mutex);
 	CloseHandle(wsman->global_mutex);
 
-	array_destroy_cb(wsman->ws_arr, free);
+	cc_array_destroy_cb(wsman->ws_arr, free);
 	wsman->ws_arr = NULL;
 
 	wsman->ws_factory = NULL;

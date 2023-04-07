@@ -43,7 +43,7 @@ static int
 b3_action_list_exec_impl(b3_action_t *action, b3_director_t *director, b3_win_t *win);
 
 static int
-b3_action_list_add_impl(b3_action_list_t *action_list, b3_action_t *new_action);
+b3_action_cc_list_add_impl(b3_action_list_t *action_list, b3_action_t *new_action);
 
 b3_action_list_t *
 b3_action_list_new(void)
@@ -64,35 +64,35 @@ b3_action_list_new(void)
     action_list->action.action_free = b3_action_list_free_impl;
     action_list->action.action_exec = b3_action_list_exec_impl;
 
-    action_list->action_list_add = b3_action_list_add_impl;
+    action_list->action_cc_list_add = b3_action_cc_list_add_impl;
 
-    array_new(&(action_list->action_arr));
+    cc_array_new(&(action_list->action_arr));
   }
 
   return action_list;
 }
 
 int
-b3_action_list_add(b3_action_list_t *action_list, b3_action_t *new_action)
+b3_action_cc_list_add(b3_action_list_t *action_list, b3_action_t *new_action)
 {
-  return action_list->action_list_add(action_list, new_action);
+  return action_list->action_cc_list_add(action_list, new_action);
 }
 
 int
 b3_action_list_free_impl(b3_action_t *action)
 {
   b3_action_list_t *action_list;
-  ArrayIter iter;
+  CC_ArrayIter iter;
 	b3_action_t *action_iter;
 
   action_list = (b3_action_list_t *) action;
 
-	array_iter_init(&iter, action_list->action_arr);
-	while (array_iter_next(&iter, (void*) &action_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, action_list->action_arr);
+	while (cc_array_iter_next(&iter, (void*) &action_iter) != CC_ITER_END) {
     b3_action_free(action_iter);
   }
 
-  array_destroy_cb(action_list->action_arr, NULL);
+  cc_array_destroy_cb(action_list->action_arr, NULL);
 
   action_list->super_action_free(action);
 
@@ -103,15 +103,15 @@ int
 b3_action_list_exec_impl(b3_action_t *action, b3_director_t *director, b3_win_t *win)
 {
   b3_action_list_t *action_list;
-  ArrayIter iter;
+  CC_ArrayIter iter;
 	b3_action_t *action_iter;
   int error;
 
   action_list = (b3_action_list_t *) action;
 
   error = 0;
-	array_iter_init(&iter, action_list->action_arr);
-	while (!error && array_iter_next(&iter, (void*) &action_iter) != CC_ITER_END) {
+	cc_array_iter_init(&iter, action_list->action_arr);
+	while (!error && cc_array_iter_next(&iter, (void*) &action_iter) != CC_ITER_END) {
     error = b3_action_exec(action_iter, director, win);
   }
 
@@ -119,9 +119,9 @@ b3_action_list_exec_impl(b3_action_t *action, b3_director_t *director, b3_win_t 
 }
 
 int
-b3_action_list_add_impl(b3_action_list_t *action_list, b3_action_t *new_action)
+b3_action_cc_list_add_impl(b3_action_list_t *action_list, b3_action_t *new_action)
 {
-  array_add(action_list->action_arr, new_action);
+  cc_array_add(action_list->action_arr, new_action);
 
   return 0;
 }

@@ -35,7 +35,7 @@
 
 #include "condition.h"
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 
 #include "director.h"
 #include "win.h"
@@ -51,9 +51,9 @@ struct b3_condition_and_s
   int (*condition_and_add)(b3_condition_and_t *condition_and, b3_condition_t *new_condition);
 
 	/**
-	 * Array of b3_condition_t *
+	 * CC_Array of b3_condition_t *
 	 */
-	Array *condition_arr;
+	CC_Array *condition_arr;
 };
 
 extern b3_condition_and_t *

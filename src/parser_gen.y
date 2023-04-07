@@ -202,7 +202,7 @@ add_to_action_list(b3_action_factory_t *action_factory,
     action_list = b3_action_factory_create_list(action_factory);
   }
 
-  b3_action_list_add(action_list, action);
+  b3_action_cc_list_add(action_list, action);
 
   return action_list;
 }

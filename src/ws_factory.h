@@ -28,7 +28,7 @@
  * @brief File contains the workspace factory class definition
  */
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 
 #include "counter.h"
 #include "ws.h"
@@ -39,9 +39,9 @@
 typedef struct b3_ws_factory_s
 {
 	/**
-	 * Array of b3_ws_t *
+	 * CC_Array of b3_ws_t *
 	 */
-	Array *ws_arr;
+	CC_Array *ws_arr;
 
 	b3_counter_t *ws_counter;
 } b3_ws_factory_t;

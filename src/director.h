@@ -31,7 +31,7 @@
 #ifndef B3_DIRECTOR_H
 #define B3_DIRECTOR_H
 
-#include <collectc/array.h>
+#include <collectc/cc_array.h>
 #include <windows.h>
 
 #include "monitor_factory.h"
@@ -51,9 +51,9 @@ struct b3_director_s
 	b3_monitor_t *focused_monitor;
 
 	/**
-	 * Array of b3_monitor_t *
+	 * CC_Array of b3_monitor_t *
 	 */
-	Array *monitor_arr;
+	CC_Array *monitor_arr;
 
 	/**
 	 * The director will receive messages from the WIN32 API that a new/other
@@ -69,9 +69,9 @@ struct b3_director_s
 	b3_monitor_factory_t *monitor_factory;
 
   /**
-	 * Array of b3_rule_t *
+	 * CC_Array of b3_rule_t *
 	 */
-	Array *rule_arr;
+	CC_Array *rule_arr;
 };
 
 /**
@@ -100,7 +100,7 @@ b3_director_refresh(b3_director_t *director);
   * @brief Gets the monitors of the director
   * @return The monitors of the director, as array of b3_monitor_t *.  Do not free it!
   */
-extern Array *
+extern CC_Array *
 b3_director_get_monitor_arr(b3_director_t *director);
 
 /**
